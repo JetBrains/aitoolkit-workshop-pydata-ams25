@@ -152,13 +152,13 @@ def build_graph() -> CompiledStateGraph[Any, Any, Any, Any]:
 
     # Define the nodes
     builder.add_node("generate", generate_with_llm)  # generation solution
-    builder.add_node("check_code", code_check)  # check code
+    builder.add_node("code_check", code_check)  # check code
 
     # Build graph
     builder.add_edge(START, "generate")
-    builder.add_edge("generate", "check_code")
+    builder.add_edge("generate", "code_check")
     builder.add_conditional_edges(
-        "check_code",
+        "code_check",
         decide_to_finish,
         {
             "end": END,
