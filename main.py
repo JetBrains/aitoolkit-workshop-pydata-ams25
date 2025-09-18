@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
 import asyncio
 
-from agent import build_graph
+# from agent import build_graph
+from agent.react_agent import build_graph
 
 
 async def main():
@@ -20,14 +21,18 @@ Requirements:
 - Validate player input.
 - Check for win conditions and draw conditions after each move."""
 
-    initial_input ={"messages": [("user", question)], "iterations": 0}
+    # initial_input ={"messages": [("user", question)], "iterations": 0}
     config = {"configurable": {"thread_id": "1"}}
-
-    print(f"Question: {question}")
-    result = await graph.ainvoke(input=initial_input, config=config)
-    answer = result["messages"][-1].content
-    print(f"Answer: {answer}")
+    #
+    # print(f"Question: {question}")
+    # result = await graph.ainvoke(input=initial_input, config=config)
+    # answer = result["messages"][-1].content
+    # print(f"Answer: {answer}")
     # ------
+    graph = build_graph()
+    result = await graph.ainvoke({"input": question}, config=config)
+    answer = result["output"]  # AgentExecutor returns {"output": ...}
+    print(answer)
 
 if __name__ == "__main__":
     load_dotenv()

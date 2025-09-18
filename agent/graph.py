@@ -3,6 +3,7 @@ __all__ = ["build_graph"]
 from functools import partial
 from typing import Any
 
+from langchain_core.tools import tool
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, StateGraph, START
 from langgraph.graph.state import CompiledStateGraph
