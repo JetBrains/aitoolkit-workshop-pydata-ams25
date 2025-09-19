@@ -1,3 +1,9 @@
+# Project related
+out/*
+answer.py
+.jbeval/*
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
