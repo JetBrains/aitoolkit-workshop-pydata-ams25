@@ -1,10 +1,10 @@
 import os
+import subprocess
+import sys
 import textwrap
 from typing import Optional
 
-import pytest
 from langchain_core.tools import tool
-
 
 from .run_dir import ensure_run_dir as _ensure_run_dir
 
@@ -42,9 +42,14 @@ def run_tests_inproc() -> Optional[str]:
         pass
 
     # Request a structured report we can parse (target the tests file directly so pytest doesn't rely on filename patterns)
-    ret = pytest.main([tst, "--maxfail=1", "--disable-warnings", f"--junitxml={xml}", "--tb=short", "--cache-clear"])
+    # ret = pytest.main([tst, "--maxfail=1", "--disable-warnings", f"--junitxml={xml}", "--tb=short", "--cache-clear"])
+    cmd = [
+        sys.executable, "-m", "pytest", tst, "--maxfail=1", f"--junitxml={xml}", "--disable-warnings", "--tb=short",
+        "--cache-clear"
+    ]
+    result = subprocess.run(cmd, check=False)
 
-    if ret == 0:
+    if result.returncode == 0:
         # On success, ensure no leftover report remains
         try:
             if os.path.exists(xml):
