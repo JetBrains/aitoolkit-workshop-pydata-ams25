@@ -113,10 +113,7 @@ def think(thought: str) -> str:
 def save_code(code: str) -> str:
     """Save solution code into a single controlled file for the current run.
 
-    Behavior and constraints:
-    - Creates a single per-run folder under <project_root>/out/<timestamp>/ on first use.
-    - Writes ONLY to <run_folder>/solution.py (overwrites if already exists this run).
-    - The folder name and file path are controlled by this tool and not configurable.
+    WARNING!!! This will overwrite any existing solution.py file in the run directory.
 
     Args:
         code: Python source to save as solution.py.
@@ -136,10 +133,7 @@ def save_code(code: str) -> str:
 def save_tests(tests: str) -> str:
     """Save tests into a single controlled file for the current run.
 
-    Behavior and constraints:
-    - Creates a single per-run folder under <project_root>/out/<timestamp>/ on first use.
-    - Writes ONLY to <run_folder>/tests.py (overwrites if already exists this run).
-    - The folder name and file path are controlled by this tool and not configurable.
+    WARNING!!! This will overwrite any existing tests.py file in the run directory.
 
     Note: When used together with run_tests_inproc, ensure your tests import from
     solution.py accordingly (e.g., `from solution import my_func`).
