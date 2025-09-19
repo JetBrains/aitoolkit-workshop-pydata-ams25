@@ -19,6 +19,8 @@ def run_tests_inproc() -> Optional[str]:
     - Expects that code and tests have already been saved via save_code and save_tests.
     - Executes pytest targeting the explicit tests.py path in the run directory.
     - Returns None if all tests pass; otherwise returns the JUnit XML report text.
+    - Clean-up: Ensures any stale JUnit report is removed before running, and deletes the report
+      after reading/returning it to avoid stale state on subsequent runs.
     """
     run_dir = _ensure_run_dir()
     sol = os.path.join(run_dir, "solution.py")
@@ -31,14 +33,35 @@ def run_tests_inproc() -> Optional[str]:
     if not os.path.exists(tst):
         return "No tests.py found in the current run directory. Use save_tests first."
 
+    # Remove any stale report before running
+    try:
+        if os.path.exists(xml):
+            os.remove(xml)
+    except Exception:
+        # Non-fatal; continue running tests
+        pass
+
     # Request a structured report we can parse (target the tests file directly so pytest doesn't rely on filename patterns)
     ret = pytest.main([tst, "--maxfail=1", "--disable-warnings", f"--junitxml={xml}", "--tb=short"])
+
     if ret == 0:
+        # On success, ensure no leftover report remains
+        try:
+            if os.path.exists(xml):
+                os.remove(xml)
+        except Exception:
+            pass
         return None
-    # Read the XML text so the caller can inspect errors/failures
+
+    # Read the XML text so the caller can inspect errors/failures, then clean up the file
     try:
         with open(xml, "r", encoding="utf-8") as f:
-            return f.read()
+            report = f.read()
+        try:
+            os.remove(xml)
+        except Exception:
+            pass
+        return report
     except Exception:
         return "Tests failed (could not read JUnit report)."
 
