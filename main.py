@@ -1,13 +1,12 @@
 from dotenv import load_dotenv
 import asyncio
 
-# from agent import build_graph
+from langchain_core.messages import HumanMessage
+
 from agent.react_agent import build_graph
 
 
 async def main():
-    graph = build_graph()
-
     # ------
     question = """Create a Python program that allows two players to play a game of Tic-Tac-Toe. The game should be played on a 3x3 grid. The program should:
 
@@ -21,17 +20,9 @@ Requirements:
 - Validate player input.
 - Check for win conditions and draw conditions after each move."""
 
-    # initial_input ={"messages": [("user", question)], "iterations": 0}
-    config = {"configurable": {"thread_id": "1"}}
-    #
-    # print(f"Question: {question}")
-    # result = await graph.ainvoke(input=initial_input, config=config)
-    # answer = result["messages"][-1].content
-    # print(f"Answer: {answer}")
-    # ------
     graph = build_graph()
-    result = await graph.ainvoke({"input": question}, config=config)
-    answer = result["output"]  # AgentExecutor returns {"output": ...}
+    result = await graph.ainvoke({"messages": [HumanMessage(content=question)]})
+    answer = result["messages"][-1].content
     print(answer)
 
 if __name__ == "__main__":

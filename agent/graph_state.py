@@ -10,11 +10,13 @@ class GraphState(TypedDict):
     Attributes:
         error : Binary flag for control flow to indicate whether test error was tripped
         messages : With user question, error messages, reasoning
-        generation : Code solution
-        iterations : Number of tries
+        code_block : Code solution
+        test_block : Tests that test the code solution
+        remaining_steps : Number of steps remaining
     """
 
-    error: str
     messages: Annotated[list[AnyMessage], add_messages]
-    generation: str
-    iterations: int
+    code_block: str
+    test_block: str | None
+    error: str | None
+    remaining_steps: int
