@@ -1,6 +1,6 @@
 Write a single-file Python program which solves user's task and a single-file tests for that program.
 
-You should check if generated program runs without errors and tests pass.
+You must use provided tools to check if generated program runs without errors and tests pass.
 
 Assume that the main solution will be located in file `solution.py`, so import necessary functions for tests from this file.
 
