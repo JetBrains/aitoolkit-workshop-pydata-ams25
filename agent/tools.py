@@ -1,5 +1,4 @@
 import os
-import tempfile
 import textwrap
 from typing import Optional
 
@@ -7,59 +6,66 @@ import pytest
 from langchain_core.tools import tool
 
 
-@tool
-def run_tests_inproc(solution: str, tests: str) -> Optional[str]:
-    """
-    Runs Python test cases alongside provided solution in an isolated environment and
-    returns a JUnit XML report of the test results in case of failure. If all tests
-    succeed, it returns None. The function leverages pytest for test execution and
-    temporarily writes the code and tests to disk during processing.
-
-    :param solution: The generated Python source code to be tested.
-    :type solution: str
-    :param tests: The generated Python test cases, written in a pytest-compatible format. Required solution functions should be imported from `solution.py`
-    :type tests: str
-    :return: A JUnit XML string containing the results if tests fail, or None if
-             all tests pass.
-    :rtype: Optional[str]
-    :raises Exception: If an error occurs while reading the generated JUnit report.
-    """
-    code_src = textwrap.dedent(solution).lstrip("\n")
-    tests_src = textwrap.dedent(tests).lstrip("\n")
-    with tempfile.TemporaryDirectory(prefix="code_gen_") as tmp:
-        sol = os.path.join(tmp, "solution.py")
-        tst = os.path.join(tmp, "test_solution.py")
-        xml = os.path.join(tmp, "report.xml")
-        with open(sol, "w", encoding="utf-8") as f:
-            f.write(code_src)
-        with open(tst, "w", encoding="utf-8") as f:
-            f.write(tests_src)
-        # Request a structured report we can parse
-        ret = pytest.main([tmp, "--maxfail=1", "--disable-warnings", f"--junitxml={xml}", "--tb=short"])
-        if ret == 0:
-            return None
-        # Read the XML text so the caller can inspect errors/failures
-        try:
-            with open(xml, "r", encoding="utf-8") as f:
-                return f.read()
-        except Exception:
-            return "Tests failed (could not read JUnit report)."
+from .run_dir import ensure_run_dir as _ensure_run_dir
 
 
 @tool
-def check_code_executes(code: str) -> str:
+def run_tests_inproc() -> Optional[str]:
     """
-    Checks if the given code compiles and executes
+    Run pytest against the current per-run output directory managed by this tool.
 
-    Args:
-        code (str): The code which needs to be checked
+    Behavior:
+    - Uses the single run folder created under <project_root>/out/<timestamp>/.
+    - Expects that code and tests have already been saved via save_code and save_tests.
+    - Executes pytest targeting the explicit tests.py path in the run directory.
+    - Returns None if all tests pass; otherwise returns the JUnit XML report text.
+    """
+    run_dir = _ensure_run_dir()
+    sol = os.path.join(run_dir, "solution.py")
+    tst = os.path.join(run_dir, "tests.py")
+    xml = os.path.join(run_dir, "report.xml")
+
+    # Validate presence of required files
+    if not os.path.exists(sol):
+        return "No solution.py found in the current run directory. Use save_code first."
+    if not os.path.exists(tst):
+        return "No tests.py found in the current run directory. Use save_tests first."
+
+    # Request a structured report we can parse (target the tests file directly so pytest doesn't rely on filename patterns)
+    ret = pytest.main([tst, "--maxfail=1", "--disable-warnings", f"--junitxml={xml}", "--tb=short"])
+    if ret == 0:
+        return None
+    # Read the XML text so the caller can inspect errors/failures
+    try:
+        with open(xml, "r", encoding="utf-8") as f:
+            return f.read()
+    except Exception:
+        return "Tests failed (could not read JUnit report)."
+
+
+@tool
+def check_code_executes() -> str:
+    """
+    Execute the saved solution.py from the current per-run directory.
+
+    Behavior:
+    - Expects that code has already been saved via save_code.
+    - Executes solution.py and reports success or returns the exception string.
 
     Returns:
-        exception (str): Result of the check: exception string or "The program has been executed successfully!" if there's no exception
+        str: Exception string if execution fails, otherwise a success message.
     """
-
     try:
-        exec(code, {})
+        run_dir = _ensure_run_dir()
+        sol_path = os.path.join(run_dir, "solution.py")
+
+        if not os.path.exists(sol_path):
+            return "No solution.py found to execute. Use save_code first."
+
+        with open(sol_path, "r", encoding="utf-8") as f:
+            src = f.read()
+        # Execute the code in a clean global namespace with the correct filename
+        exec(compile(src, sol_path, "exec"), {})
         return "The program has been executed successfully!"
     except Exception as e:
         return str(e)
@@ -77,3 +83,52 @@ def think(thought: str) -> str:
            :return: The full log of thoughts and the new thought.
     """
     return thought
+
+
+@tool
+def save_code(code: str) -> str:
+    """Save solution code into a single controlled file for the current run.
+
+    Behavior and constraints:
+    - Creates a single per-run folder under <project_root>/out/<timestamp>/ on first use.
+    - Writes ONLY to <run_folder>/solution.py (overwrites if already exists this run).
+    - The folder name and file path are controlled by this tool and not configurable.
+
+    Args:
+        code: Python source to save as solution.py.
+
+    Returns:
+        Absolute file path to the saved solution.py.
+    """
+    run_dir = _ensure_run_dir()
+    sol_path = os.path.join(run_dir, "solution.py")
+    code_src = textwrap.dedent(code).lstrip("\n")
+    with open(sol_path, "w", encoding="utf-8") as f:
+        f.write(code_src)
+    return sol_path
+
+
+@tool
+def save_tests(tests: str) -> str:
+    """Save tests into a single controlled file for the current run.
+
+    Behavior and constraints:
+    - Creates a single per-run folder under <project_root>/out/<timestamp>/ on first use.
+    - Writes ONLY to <run_folder>/tests.py (overwrites if already exists this run).
+    - The folder name and file path are controlled by this tool and not configurable.
+
+    Note: When used together with run_tests_inproc, ensure your tests import from
+    solution.py accordingly (e.g., `from solution import my_func`).
+
+    Args:
+        tests: Python tests (e.g., pytest-style) to save as tests.py.
+
+    Returns:
+        Absolute file path to the saved tests.py.
+    """
+    run_dir = _ensure_run_dir()
+    tests_path = os.path.join(run_dir, "tests.py")
+    tests_src = textwrap.dedent(tests).lstrip("\n")
+    with open(tests_path, "w", encoding="utf-8") as f:
+        f.write(tests_src)
+    return tests_path
