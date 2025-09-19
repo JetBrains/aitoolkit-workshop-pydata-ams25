@@ -8,25 +8,25 @@ from langchain_core.tools import tool
 
 
 @tool
-def run_tests_inproc(code: str, tests: str) -> Optional[str]:
+def run_tests_inproc(solution: str, tests: str) -> Optional[str]:
     """
-    Runs Python test cases alongside provided code in an isolated environment and
+    Runs Python test cases alongside provided solution in an isolated environment and
     returns a JUnit XML report of the test results in case of failure. If all tests
     succeed, it returns None. The function leverages pytest for test execution and
     temporarily writes the code and tests to disk during processing.
 
-    :param code: The Python source code to be tested.
-    :type code: str
-    :param tests: The Python test cases, written in a pytest-compatible format.
+    :param solution: The generated Python source code to be tested.
+    :type solution: str
+    :param tests: The generated Python test cases, written in a pytest-compatible format. Required solution functions should be imported from `solution.py`
     :type tests: str
     :return: A JUnit XML string containing the results if tests fail, or None if
              all tests pass.
     :rtype: Optional[str]
     :raises Exception: If an error occurs while reading the generated JUnit report.
     """
-    code_src = textwrap.dedent(code).lstrip("\n")
+    code_src = textwrap.dedent(solution).lstrip("\n")
     tests_src = textwrap.dedent(tests).lstrip("\n")
-    with tempfile.TemporaryDirectory() as tmp:
+    with tempfile.TemporaryDirectory(prefix="code_gen_") as tmp:
         sol = os.path.join(tmp, "solution.py")
         tst = os.path.join(tmp, "test_solution.py")
         xml = os.path.join(tmp, "report.xml")
