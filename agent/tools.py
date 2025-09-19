@@ -57,10 +57,6 @@ def run_tests_inproc() -> Optional[str]:
     try:
         with open(xml, "r", encoding="utf-8") as f:
             report = f.read()
-        try:
-            os.remove(xml)
-        except Exception:
-            pass
         return report
     except Exception:
         return "Tests failed (could not read JUnit report)."
