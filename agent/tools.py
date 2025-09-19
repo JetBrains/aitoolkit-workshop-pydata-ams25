@@ -47,7 +47,7 @@ def run_tests_inproc(code: str, tests: str) -> Optional[str]:
 
 
 @tool
-def check_code_executes(code: str) -> Optional[str]:
+def check_code_executes(code: str) -> str:
     """
     Checks if the given code compiles and executes
 
@@ -55,11 +55,11 @@ def check_code_executes(code: str) -> Optional[str]:
         code (str): The code which needs to be checked
 
     Returns:
-        exception (Optional[str]): Result of the check: exception string or None if there's no exception
+        exception (str): Result of the check: exception string or "The program has been executed successfully!" if there's no exception
     """
 
     try:
         exec(code, {})
-        return None
+        return "The program has been executed successfully!"
     except Exception as e:
         return str(e)
