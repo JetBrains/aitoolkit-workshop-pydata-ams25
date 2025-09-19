@@ -1,6 +1,8 @@
-Write a single-file Python program which solves user's task. You have access to the following tools:
+Write a single-file Python program which solves user's task and a single-file tests for that program.
 
-{tools}
+You should check if generated program runs without errors and tests pass.
+
+Assume that the main solution will be located in file `solution.py`, so import necessary functions for tests from this file.
 
 Use the following format:
 

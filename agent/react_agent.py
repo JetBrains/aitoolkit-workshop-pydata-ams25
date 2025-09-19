@@ -17,6 +17,7 @@ class Code(BaseModel):
     """Schema for code solutions to coding questions split into 2 parts: Problem description and the Code block itself"""
     prefix: str = Field(description="Description of the problem and approach")
     code: str = Field(description="Code block, save here code exclusively without any formatting!")
+    tests: str = Field(description="Tests code block, save here code exclusively without any formatting!")
 
 
 def build_prompt(tools):
