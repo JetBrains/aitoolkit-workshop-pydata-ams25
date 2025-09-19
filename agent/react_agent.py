@@ -50,7 +50,7 @@ def build_prompt(tools):
 def build_graph():
     tools = [check_code_executes, run_tests_inproc, think]
     agent = create_react_agent(
-        ChatOpenAI(model="gpt-5-nano"),
+        ChatOpenAI(model="gpt-4o-mini"),
         tools,
         checkpointer=MemorySaver(),
         response_format=Code,
