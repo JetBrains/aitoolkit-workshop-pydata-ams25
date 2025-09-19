@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from dotenv import load_dotenv
 import asyncio
 
@@ -21,9 +23,12 @@ Requirements:
 - Check for win conditions and draw conditions after each move."""
 
     graph = build_graph()
-    result = await graph.ainvoke({"messages": [HumanMessage(content=question)]})
+    result = await graph.ainvoke({"messages": [HumanMessage(content=question)]}, config={"configurable": {"thread_id": "1"}})
     answer = result["messages"][-1].content
     print(answer)
+    code = result["structured_response"].code
+    code = code.replace("```python", "").replace("```", "")
+    Path("answer.py").write_text(code)
 
 if __name__ == "__main__":
     load_dotenv()

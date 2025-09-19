@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
@@ -15,7 +16,7 @@ from agent.tools import run_tests_inproc
 class Code(BaseModel):
     """Schema for code solutions to coding questions split into 2 parts: Problem description and the Code block itself"""
     prefix: str = Field(description="Description of the problem and approach")
-    code: str = Field(description="Code block")
+    code: str = Field(description="Code block, save here code exclusively without any formatting!")
 
 
 def build_graph():
@@ -23,7 +24,8 @@ def build_graph():
     agent = create_react_agent(
         ChatOpenAI(model="gpt-4o"),
         tools,
-        state_schema=GraphState,
+        checkpointer=MemorySaver(),
+        response_format=Code,
         # prompt=PromptTemplate.from_template(Path("agent/react.prompt").read_text()),
     )
     return agent
