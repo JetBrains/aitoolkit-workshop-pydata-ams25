@@ -25,7 +25,6 @@ def run_tests_inproc() -> Optional[str]:
     run_dir = _ensure_run_dir()
     sol = os.path.join(run_dir, "solution.py")
     tst = os.path.join(run_dir, "tests.py")
-    xml = os.path.join(run_dir, "report.xml")
 
     # Validate presence of required files
     if not os.path.exists(sol):
@@ -33,38 +32,16 @@ def run_tests_inproc() -> Optional[str]:
     if not os.path.exists(tst):
         return "No tests.py found in the current run directory. Use save_tests first."
 
-    # Remove any stale report before running
-    try:
-        if os.path.exists(xml):
-            os.remove(xml)
-    except Exception:
-        # Non-fatal; continue running tests
-        pass
-
     # Request a structured report we can parse (target the tests file directly so pytest doesn't rely on filename patterns)
-    # ret = pytest.main([tst, "--maxfail=1", "--disable-warnings", f"--junitxml={xml}", "--tb=short", "--cache-clear"])
     cmd = [
-        sys.executable, "-m", "pytest", tst, "--maxfail=1", f"--junitxml={xml}", "--disable-warnings", "--tb=short",
+        sys.executable, "-m", "pytest", tst, "--maxfail=1", f"--junitxml=-", "--disable-warnings", "--tb=short",
         "--cache-clear"
     ]
-    result = subprocess.run(cmd, check=False)
-
+    result = subprocess.run(cmd, check=False, capture_output=True, text=True)
     if result.returncode == 0:
-        # On success, ensure no leftover report remains
-        try:
-            if os.path.exists(xml):
-                os.remove(xml)
-        except Exception:
-            pass
         return "All tests passed."
-
-    # Read the XML text so the caller can inspect errors/failures, then clean up the file
-    try:
-        with open(xml, "r", encoding="utf-8") as f:
-            report = f.read()
-        return report
-    except Exception:
-        return "Tests failed (could not read JUnit report)."
+    else:
+        return result.stderr + "\n" + result.stdout
 
 
 @tool
