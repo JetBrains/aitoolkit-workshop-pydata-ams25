@@ -42,7 +42,7 @@ def run_tests_inproc() -> Optional[str]:
         pass
 
     # Request a structured report we can parse (target the tests file directly so pytest doesn't rely on filename patterns)
-    ret = pytest.main([tst, "--maxfail=1", "--disable-warnings", f"--junitxml={xml}", "--tb=short"])
+    ret = pytest.main([tst, "--maxfail=1", "--disable-warnings", f"--junitxml={xml}", "--tb=short", "--cache-clear"])
 
     if ret == 0:
         # On success, ensure no leftover report remains
