@@ -10,6 +10,8 @@ from pydantic import Field
 
 from agent.tools import check_code_executes
 from agent.tools import run_tests_inproc
+from agent.tools import save_code
+from agent.tools import save_tests
 from agent.tools import think
 
 
@@ -48,7 +50,7 @@ def build_prompt(tools):
 
 
 def build_graph():
-    tools = [check_code_executes, run_tests_inproc, think]
+    tools = [think, save_code, save_tests, check_code_executes, run_tests_inproc]
     agent = create_react_agent(
         ChatOpenAI(model="gpt-4o-mini"),
         tools,
