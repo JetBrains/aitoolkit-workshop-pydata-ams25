@@ -11,8 +11,3 @@ Action Input: the input to the action
 Observation: the result of the action
 ... (this Python intermediate program/Action/Action Input/Observation can repeat N times)
 Python final program: I now have the final program
-
-Begin!
-
-Question: {input}
-Python intermediate program: {agent_scratchpad}
