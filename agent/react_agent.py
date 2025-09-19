@@ -5,22 +5,12 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel
-from pydantic import Field
 
 from agent.tools import check_code_executes
 from agent.tools import run_tests_inproc
 from agent.tools import save_code
 from agent.tools import save_tests
 from agent.tools import think
-
-
-# Data model
-class Code(BaseModel):
-    """Schema for code solutions to coding questions split into 2 parts: Problem description and the Code block itself"""
-    prefix: str = Field(description="Very brief description of the problem and approach")
-    code: str = Field(description="Code block, save here code exclusively without any formatting!")
-    tests: str = Field(description="Tests code block, save here code exclusively without any formatting!")
 
 
 def build_prompt(tools):
@@ -55,7 +45,6 @@ def build_graph():
         ChatOpenAI(model="gpt-4o-mini"),
         tools,
         checkpointer=MemorySaver(),
-        response_format=Code,
         prompt=SystemMessage(build_prompt(tools)),
     )
     return agent

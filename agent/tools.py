@@ -51,7 +51,7 @@ def run_tests_inproc() -> Optional[str]:
                 os.remove(xml)
         except Exception:
             pass
-        return None
+        return "All tests passed."
 
     # Read the XML text so the caller can inspect errors/failures, then clean up the file
     try:

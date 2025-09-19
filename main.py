@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from dotenv import load_dotenv
 import asyncio
 
@@ -26,9 +24,6 @@ Requirements:
     result = await graph.ainvoke({"messages": [HumanMessage(content=question)]}, config={"configurable": {"thread_id": "1"}})
     answer = result["messages"][-1].content
     print(answer)
-    code = result["structured_response"].code
-    code = code.replace("```python", "").replace("```", "")
-    Path("answer.py").write_text(code)
 
 if __name__ == "__main__":
     load_dotenv()
