@@ -1,75 +1,6 @@
 import os
-import subprocess
-import sys
-import textwrap
-from typing import Optional
 
 from langchain_core.tools import tool
-
-from .run_dir import ensure_run_dir as _ensure_run_dir
-
-
-@tool
-def run_tests_inproc() -> Optional[str]:
-    """
-    Run pytest against the current per-run output directory managed by this tool.
-
-    Behavior:
-    - Uses the single run folder created under <project_root>/out/<timestamp>/.
-    - Expects that code and tests have already been saved via save_code and save_tests.
-    - Executes pytest targeting the explicit tests.py path in the run directory.
-    - Returns None if all tests pass; otherwise returns the JUnit XML report text.
-    - Clean-up: Ensures any stale JUnit report is removed before running, and deletes the report
-      after reading/returning it to avoid stale state on subsequent runs.
-    """
-    run_dir = _ensure_run_dir()
-    sol = os.path.join(run_dir, "solution.py")
-    tst = os.path.join(run_dir, "tests.py")
-
-    # Validate presence of required files
-    if not os.path.exists(sol):
-        return "No solution.py found in the current run directory. Use save_code first."
-    if not os.path.exists(tst):
-        return "No tests.py found in the current run directory. Use save_tests first."
-
-    # Request a structured report we can parse (target the tests file directly so pytest doesn't rely on filename patterns)
-    cmd = [
-        sys.executable, "-m", "pytest", tst, "--maxfail=1", f"--junitxml=-", "--disable-warnings", "--tb=short",
-        "--cache-clear"
-    ]
-    result = subprocess.run(cmd, check=False, capture_output=True, text=True)
-    if result.returncode == 0:
-        return "All tests passed."
-    else:
-        return result.stderr + "\n" + result.stdout
-
-
-@tool
-def check_code_executes() -> str:
-    """
-    Execute the saved solution.py from the current per-run directory.
-
-    Behavior:
-    - Expects that code has already been saved via save_code.
-    - Executes solution.py and reports success or returns the exception string.
-
-    Returns:
-        str: Exception string if execution fails, otherwise a success message.
-    """
-    try:
-        run_dir = _ensure_run_dir()
-        sol_path = os.path.join(run_dir, "solution.py")
-
-        if not os.path.exists(sol_path):
-            return "No solution.py found to execute. Use save_code first."
-
-        with open(sol_path, "r", encoding="utf-8") as f:
-            src = f.read()
-        # Execute the code in a clean global namespace with the correct filename
-        exec(compile(src, sol_path, "exec"), {})
-        return "The program has been executed successfully!"
-    except Exception as e:
-        return str(e)
 
 
 @tool
@@ -87,43 +18,11 @@ def think(thought: str) -> str:
 
 
 @tool
-def save_code(code: str) -> str:
-    """Save solution code into a single controlled file for the current run.
-
-    WARNING!!! This will overwrite any existing solution.py file in the run directory.
-
-    Args:
-        code: Python source to save as solution.py.
+def read_schedule() -> str:
+    """Use this tool to read the PyData schedule about which a user will ask questions.
 
     Returns:
-        Absolute file path to the saved solution.py.
+        str: The PyData Amsterdam 2025 schedule data.
+        The file is located in the 'data' directory.
     """
-    run_dir = _ensure_run_dir()
-    sol_path = os.path.join(run_dir, "solution.py")
-    code_src = textwrap.dedent(code).lstrip("\n")
-    with open(sol_path, "w", encoding="utf-8") as f:
-        f.write(code_src)
-    return sol_path
-
-
-@tool
-def save_tests(tests: str) -> str:
-    """Save tests into a single controlled file for the current run.
-
-    WARNING!!! This will overwrite any existing tests.py file in the run directory.
-
-    Note: When used together with run_tests_inproc, ensure your tests import from
-    solution.py accordingly (e.g., `from solution import my_func`).
-
-    Args:
-        tests: Python tests (e.g., pytest-style) to save as tests.py.
-
-    Returns:
-        Absolute file path to the saved tests.py.
-    """
-    run_dir = _ensure_run_dir()
-    tests_path = os.path.join(run_dir, "tests.py")
-    tests_src = textwrap.dedent(tests).lstrip("\n")
-    with open(tests_path, "w", encoding="utf-8") as f:
-        f.write(tests_src)
-    return tests_path
+    return os.path.join("data", "pydata_amsterdam_2025_schedule.csv")
