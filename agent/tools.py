@@ -25,4 +25,7 @@ def read_schedule() -> str:
         str: The PyData Amsterdam 2025 schedule data.
         The file is located in the 'data' directory.
     """
-    return os.path.join("data", "pydata_amsterdam_2025_schedule.csv")
+    schedule_path = os.path.join("data", "pydata_amsterdam_2025_schedule.csv")
+    with open(schedule_path, "r") as f:
+        schedule = f.read()
+    return schedule
