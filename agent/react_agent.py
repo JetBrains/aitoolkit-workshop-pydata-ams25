@@ -6,6 +6,7 @@ from langgraph.prebuilt import create_react_agent
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 
+from agent.tools import get_current_datetime
 from agent.tools import read_schedule
 from agent.tools import think
 
@@ -37,7 +38,7 @@ def build_prompt(tools):
 
 
 def build_graph():
-    tools = [think, read_schedule]
+    tools = [think, read_schedule, get_current_datetime]
     agent = create_react_agent(
         ChatOpenAI(model="gpt-4o-mini"),
         tools,

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from langchain_core.tools import tool
 
@@ -29,3 +30,13 @@ def read_schedule() -> str:
     with open(schedule_path, "r") as f:
         schedule = f.read()
     return schedule
+
+
+@tool
+def get_current_datetime() -> str:
+    """Get the current date and time.
+
+    Returns:
+        str: The current date and time in format YYYY-MM-DD HH:MM:SS
+    """
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
