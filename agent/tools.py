@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import datetime
 
 from langchain_core.tools import tool
@@ -40,3 +41,19 @@ def get_current_datetime() -> str:
         str: The current date and time in format YYYY-MM-DD HH:MM:SS
     """
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+@tool
+def get_event_details(event_id: str) -> str:
+    """Get detailed information about a specific event.
+
+    Args:
+        event_id: The ID of the event to get details for.
+
+    Returns:
+        str: The detailed description of the event.
+    """
+    descriptions_path = os.path.join("data", "pydata_amsterdam_2025_descriptions.json")
+    with open(descriptions_path, "r") as f:
+        descriptions = json.load(f)
+    return json.dumps(descriptions.get(event_id, {}))
