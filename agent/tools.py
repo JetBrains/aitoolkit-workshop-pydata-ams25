@@ -1,3 +1,5 @@
+import os
+
 from langchain_core.tools import tool
 
 
@@ -13,3 +15,13 @@ def think(thought: str) -> str:
            :return: The full log of thoughts and the new thought.
     """
     return thought
+
+
+@tool
+def read_schedule() -> str:
+    """Use this tool to read the PyData schedule about which a user will ask questions.
+
+    Returns:
+        str: The PyData Amsterdam 2025 schedule data as JSON text.
+    """
+    return os.path.join("data", "pydata_amsterdam_2025_schedule.json")
