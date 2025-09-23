@@ -23,3 +23,7 @@ Instead of `read_schedule() -> str` implement:
 * `list_event_names() -> str`
 * `get_event_details(event_name: str) -> str`
 * `list_events_by_timeframe(start: str, end: str) -> str`
+
+
+## EXTRA - Part 3: Deploying agent
+Build a streamlit app, deploy it and send it to other attendees of PyData :).
