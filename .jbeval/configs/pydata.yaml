@@ -1,0 +1,31 @@
+---
+evaluator:
+  type: "llm_judge"
+  params:
+    max_votes: 3
+    max_concurrency: 5
+model:
+  params:
+    model_name: "gpt-4o-mini"
+    temperature: 0.0
+  api_key: null
+prompt:
+  template: "You are an automated judge. You will receive:\n- A Task description.\n\
+    - A Reference Output (ground truth).\n- A Model Output to evaluate.\n\nGiven each\
+    \ task, compare the Model Output to the Reference Output (ignoring case and extra\
+    \ whitespace) and assign one of two integer scores: 0 or 1, according to:\n\n\
+    1 - Mostly matches the provided Reference Output (minor errors or small omissions)\n\
+    0 - Mstly doesn't match the Reference Output (significant errors or missallignment)\n\
+    \nRespond only with a JSON object containing both fields: \"score\" (0 or 1) and\
+    \ \"explanation\" (a brief justification for the score). For example:\n```json\n\
+    {{ \"score\": 1, \"explanation\": \"Matches the reference aside from casing/spacing.\"\
+    \ }}\n```\n\nNow evaluate:\n\nTask: {input}\nReference Output: {output_expected}\n\
+    Model Output: {output_gen}\n"
+  input_variables:
+    input: "input"
+    output_expected: "output_expected"
+    output_gen: "output_gen"
+output:
+  dir: ".jbeval/eval"
+extra:
+  dataset_path: "/Users/Yaroslav.Sokolov/ait/aitoolkit-workshop-pydata-ams25/.jbeval/eval/pydata.json"

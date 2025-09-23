@@ -1,0 +1,1 @@
+{"runConfig":"main","mapping":{"input":"$.rootEvents[0].children[0].payload.inputs","output":"$.rootEvents[-1].children[-1].payload.outputs.messages[-1].content"}}
