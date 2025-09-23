@@ -10,7 +10,7 @@ async def main():
     question = "Which talk is first?"  # Task 1
     # question = "Which talk is happening right now?"  # Task 2
     # question = "What is the 'Untitled13.ipynb' talk about?"  # Task 3
-    # question = "Which company does the speaker of the current talk?"  # Task 4
+    # question = "Which company does the speaker of the current talk work for?"  # Task 4
 
     # --- EXTRA TASKS! ---
 
