@@ -1,6 +1,11 @@
-import os
+import json
 
 from langchain_core.tools import tool
+
+from utils.datetime import current_datetime
+from utils.schedule import get_descriptions
+from utils.schedule import get_schedule
+from utils.schedule import get_speakers
 
 
 @tool
@@ -24,4 +29,46 @@ def read_schedule() -> str:
     Returns:
         str: The PyData Amsterdam 2025 schedule data as JSON text.
     """
-    return os.path.join("data", "pydata_amsterdam_2025_schedule.json")
+    schedule = get_schedule(out_format="dict")
+    return json.dumps(schedule, indent=4)
+
+
+@tool
+def get_current_datetime() -> str:
+    """Get the current CET date and time.
+
+    Returns:
+        str: The current date and time in format YYYY-MM-DD HH:MM:SS
+    """
+    return current_datetime()
+
+
+@tool
+def get_event_details(event_id: str) -> str:
+    """Get detailed information about a specific event.
+
+    Args:
+        event_id: The ID of the event to get details for.
+
+    Returns:
+        str: The detailed description of the event.
+    """
+    descriptions = get_descriptions(out_format="dict")
+    return json.dumps(descriptions.get(event_id, {}), indent=4)
+
+
+@tool
+def get_speaker_bio(speaker_name: str) -> str:
+    """Get biography information about a specific speaker.
+
+    Args:
+        speaker_name: The name of the speaker to get biography for.
+
+    Returns:
+        str: The biography of the speaker if found, or error message if not found.
+    """
+    speakers = get_speakers(out_format="dict")
+    speaker = speakers.get(speaker_name, None)
+    if not speaker:
+        return json.dumps({"error": "Speaker not found"}, indent=4)
+    return json.dumps(speaker, indent=4)
