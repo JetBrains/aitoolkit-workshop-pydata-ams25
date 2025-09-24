@@ -28,13 +28,3 @@ def read_schedule() -> str:
     """
     schedule = get_schedule(out_format="dict")
     return json.dumps(schedule, indent=4)
-
-
-@tool
-def get_current_datetime() -> str:
-    """Get the current date and time.
-
-    Returns:
-        str: The current date and time in format YYYY-MM-DD HH:MM:SS
-    """
-    return current_datetime()
