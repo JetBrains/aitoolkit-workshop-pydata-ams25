@@ -60,4 +60,4 @@ prompt:
 output:
   dir: ".jbeval/eval"
 extra:
-  dataset_path: "/Users/Yaroslav.Sokolov/ait/aitoolkit-workshop-pydata-ams25/.jbeval/eval/before.json"
+  dataset_path: ".jbeval/eval/before.json"
