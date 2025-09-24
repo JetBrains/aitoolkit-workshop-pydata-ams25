@@ -22,7 +22,7 @@ Go to the project's root directory.
 First, [install uv](https://docs.astral.sh/uv/getting-started/installation/) if you haven't already.  
 Install Python via uv:  
 ```bash
-uv python install 3.10
+uv python install 3.12
 ```  
 Install project dependencies:  
 ```bash
