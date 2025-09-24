@@ -6,7 +6,7 @@
 
 ## Install AI Agents Debugger Plugin
 
-Download the zip archive of the plugin: [link]().  
+Download the zip archive of the plugin: [link](https://drive.google.com/file/d/1mgyU7oQlVn4qCaSuKvMvZBCpHoz77dL0).  
 Then install it manually: 
  * Go to PyCharm
  * Settings (gear icon top-right corner) --> `Plugins`  
